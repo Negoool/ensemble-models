@@ -21,6 +21,8 @@ def plot_digit(data):
     plt.axis("off")
 plot_digit(X_mnist[36000])
 
+class shift_
+
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 pre_pipline = Pipeline([
@@ -104,7 +106,7 @@ log_clf = LogisticRegression(multi_class = 'multinomial', solver = 'lbfgs',
 # print "logistic ACCURACY(validation): " , result.mean(), result.std()
 
 from sklearn.svm import SVC
-svm_clf = SVC(random_state = 42)
+svm_clf = SVC(random_state = 42, probability = True)
 # svm_clf.fit(X_train, y_train)
 # print "SVM ACCURACY:(train) ", accuracy_score(svm_clf.predict(X_train), y_train)
 
@@ -112,8 +114,11 @@ svm_clf = SVC(random_state = 42)
 ## analyzing error
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix
+from sklearn.ensemble import VotingClassifier
+voting_clf = VotingClassifier([('rnd_clf', rnd_clf),('extra_clf', extra_clf),\
+('log_clf', log_clf),('svm_clf', svm_clf)], voting = 'soft')
 
-for clf in (rnd_clf, extra_clf, log_clf, svm_clf):
+for clf in (rnd_clf, extra_clf, log_clf, svm_clf, voting_clf):
     pred = cross_val_predict(clf, X_train, y_train, cv =3)
     print (clf.__class__.__name__ , accuracy_score(pred, y_train))
     conf_matrix = confusion_matrix(pred, y_train)
@@ -123,6 +128,7 @@ for clf in (rnd_clf, extra_clf, log_clf, svm_clf):
     plt.figure()
     plt.matshow(conf_matrix_norm, cmap = 'gray')
     plt.savefig(clf.__class__.__name__ + ".png", format='png', dpi=300)
+
 
 
 plt.show()
