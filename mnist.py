@@ -14,6 +14,17 @@ shuffled_indices = np.random.permutation(len(X_train))
 X_train = X_train[shuffled_indices]
 y_train = y_train[shuffled_indices]
 
+print (X_train[0,0]).nbytes
+print np.dtype(np.unit8).itemsize
+
+X_train = X_train.reshape(len(X_train), 28,28)
+right = np.c_[np.zeros((len(X_train),28,1)), X_train[:,:,:-1]]
+left = np.c_[X_train[:,:,1:], np.zeros((len(X_train),28,1))]
+up = np.append(X_train[:,1:,], np.zeros((len(X_train), 1,28)), axis = 1)
+down = np.append( np.zeros((len(X_train), 1,28)), X_train[:,:-1,], axis = 1)
+x_total_i = np.concatenate((X_train, right, left, up, down), axis = 2)
+print x_total_i.shape
+
 def plot_digit(data):
     image = data.reshape((28,28))
     plt.imshow(image, cmap = 'binary')
@@ -21,7 +32,6 @@ def plot_digit(data):
     plt.axis("off")
 plot_digit(X_mnist[36000])
 
-class shift_
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
