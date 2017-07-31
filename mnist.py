@@ -14,17 +14,6 @@ shuffled_indices = np.random.permutation(len(X_train))
 X_train = X_train[shuffled_indices]
 y_train = y_train[shuffled_indices]
 
-print (X_train[0,0]).nbytes
-print np.dtype(np.unit8).itemsize
-
-X_train = X_train.reshape(len(X_train), 28,28)
-right = np.c_[np.zeros((len(X_train),28,1)), X_train[:,:,:-1]]
-left = np.c_[X_train[:,:,1:], np.zeros((len(X_train),28,1))]
-up = np.append(X_train[:,1:,], np.zeros((len(X_train), 1,28)), axis = 1)
-down = np.append( np.zeros((len(X_train), 1,28)), X_train[:,:-1,], axis = 1)
-x_total_i = np.concatenate((X_train, right, left, up, down), axis = 2)
-print x_total_i.shape
-
 def plot_digit(data):
     image = data.reshape((28,28))
     plt.imshow(image, cmap = 'binary')
@@ -32,6 +21,27 @@ def plot_digit(data):
     plt.axis("off")
 plot_digit(X_mnist[36000])
 
+
+print (X_train[0,0]).nbytes
+print np.dtype(np.unit8).itemsize
+def extenssion( X_train, add_right = 1, add_left = 1, add_down = 1, add_up =1):
+    X_train = X_train.reshape(len(X_train), 28,28)
+    X_extend = X_train[:]
+    if add_right:
+        right = np.c_[np.zeros((len(X_train),28,1)), X_train[:,:,:-1]]
+        X_extend = np.concatenate((X_extend, right), axis =2)
+    if add_left:
+        left = np.c_[X_train[:,:,1:], np.zeros((len(X_train),28,1))]
+        X_extend = np.concatenate((X_extend, left), axis =2)
+    if add_down:
+        down = np.append( np.zeros((len(X_train), 1,28)), X_train[:,:-1,], axis = 1)
+        X_extend = np.concatenate((X_extend, down), axis =2)
+    if add_up:
+        up = np.append(X_train[:,1:,], np.zeros((len(X_train), 1,28)), axis = 1)
+        X_extend = np.concatenate((X_extend, up), axis =2)
+    return X_extend
+
+X_extend = extenssion(X_train)
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
