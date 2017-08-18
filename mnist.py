@@ -23,25 +23,27 @@ plot_digit(X_mnist[36000])
 
 
 print (X_train[0,0]).nbytes
-print np.dtype(np.unit8).itemsize
-def extenssion( X_train, add_right = 1, add_left = 1, add_down = 1, add_up =1):
-    X_train = X_train.reshape(len(X_train), 28,28)
-    X_extend = X_train[:]
-    if add_right:
-        right = np.c_[np.zeros((len(X_train),28,1)), X_train[:,:,:-1]]
-        X_extend = np.concatenate((X_extend, right), axis =2)
-    if add_left:
-        left = np.c_[X_train[:,:,1:], np.zeros((len(X_train),28,1))]
-        X_extend = np.concatenate((X_extend, left), axis =2)
-    if add_down:
-        down = np.append( np.zeros((len(X_train), 1,28)), X_train[:,:-1,], axis = 1)
-        X_extend = np.concatenate((X_extend, down), axis =2)
-    if add_up:
-        up = np.append(X_train[:,1:,], np.zeros((len(X_train), 1,28)), axis = 1)
-        X_extend = np.concatenate((X_extend, up), axis =2)
-    return X_extend
 
-X_extend = extenssion(X_train)
+# def extenssion( X_train, add_right = 1, add_left = 1, add_down = 1, add_up =1):
+#     X_train = X_train.reshape(len(X_train), 28,28)
+#     X_extend = X_train[:]
+#     if add_right:
+#         right = np.c_[np.zeros((len(X_train),28,1)), X_train[:,:,:-1]]
+#         X_extend = np.concatenate((X_extend, right), axis =2)
+#     if add_left:
+#         left = np.c_[X_train[:,:,1:], np.zeros((len(X_train),28,1))]
+#         X_extend = np.concatenate((X_extend, left), axis =2)
+#     if add_down:
+#         down = np.append( np.zeros((len(X_train), 1,28)), X_train[:,:-1,], axis = 1)
+#         X_extend = np.concatenate((X_extend, down), axis =2)
+#     if add_up:
+#         up = np.append(X_train[:,1:,], np.zeros((len(X_train), 1,28)), axis = 1)
+#         X_extend = np.concatenate((X_extend, up), axis =2)
+#     return X_extend
+#
+# X_extend = extenssion(X_train)
+# X_extend = X_extend.reshape(-1,60000)
+# print X_extend.shape
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -127,8 +129,8 @@ log_clf = LogisticRegression(multi_class = 'multinomial', solver = 'lbfgs',
 
 from sklearn.svm import SVC
 svm_clf = SVC(random_state = 42, probability = True)
-# svm_clf.fit(X_train, y_train)
-# print "SVM ACCURACY:(train) ", accuracy_score(svm_clf.predict(X_train), y_train)
+svm_clf.fit(X_train, y_train)
+print "SVM ACCURACY:(train) ", accuracy_score(svm_clf.predict(X_train), y_train)
 
 
 ## analyzing error
@@ -137,17 +139,17 @@ from sklearn.metrics import confusion_matrix
 from sklearn.ensemble import VotingClassifier
 voting_clf = VotingClassifier([('rnd_clf', rnd_clf),('extra_clf', extra_clf),\
 ('log_clf', log_clf),('svm_clf', svm_clf)], voting = 'soft')
-
-for clf in (rnd_clf, extra_clf, log_clf, svm_clf, voting_clf):
-    pred = cross_val_predict(clf, X_train, y_train, cv =3)
-    print (clf.__class__.__name__ , accuracy_score(pred, y_train))
-    conf_matrix = confusion_matrix(pred, y_train)
-    row_sum = conf_matrix.sum(axis =1, keepdims = True )
-    conf_matrix_norm = conf_matrix.astype(np.float)/row_sum
-    np.fill_diagonal(conf_matrix_norm, 0)
-    plt.figure()
-    plt.matshow(conf_matrix_norm, cmap = 'gray')
-    plt.savefig(clf.__class__.__name__ + ".png", format='png', dpi=300)
+#
+# for clf in (rnd_clf, extra_clf, log_clf, svm_clf, voting_clf):
+#     pred = cross_val_predict(clf, X_train, y_train, cv =3)
+#     print (clf.__class__.__name__ , accuracy_score(pred, y_train))
+#     conf_matrix = confusion_matrix(pred, y_train)
+#     row_sum = conf_matrix.sum(axis =1, keepdims = True )
+#     conf_matrix_norm = conf_matrix.astype(np.float)/row_sum
+#     np.fill_diagonal(conf_matrix_norm, 0)
+#     plt.figure()
+#     plt.matshow(conf_matrix_norm, cmap = 'gray')
+#     plt.savefig(clf.__class__.__name__ + ".png", format='png', dpi=300)
 
 
 
